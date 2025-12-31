@@ -1,4 +1,4 @@
-To incorporate your screenshot as a sample of the output, I have updated the **Strategic Implementations** section of the README. This visual sample directly correlates to the signals generated in your notebook's "Today's Alpha Signals" query.
+
 
 ---
 
