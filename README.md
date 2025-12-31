@@ -61,4 +61,4 @@ To generate returns independent of broader market direction, we implement a **Pa
 
 ---
 
-**Would you like me to help you create a "Getting Started" section for this README, or perhaps a section on how to interpret the Z-scores in the pairs trading module?**
+
