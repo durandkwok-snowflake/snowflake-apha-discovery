@@ -1,0 +1,9 @@
+name: app_environment
+channels:
+  - snowflake
+dependencies:
+  - plotly=*
+  - polars=*
+  - scikit-learn=*
+  - scipy=*
+  - nbformat=*
