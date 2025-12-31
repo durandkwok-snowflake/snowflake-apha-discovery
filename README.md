@@ -101,6 +101,119 @@ session.table("MARKET_DATA").show(5)
 
 <img width="538" height="210" alt="image" src="https://github.com/user-attachments/assets/05dc2112-89ab-46fd-967e-6a5b728823d3" />
 
+## Generate sample news headlines and use Snowflake Cortex AI for sentiment analysis
+```PYTHON
+# Generate sample news headlines and use SNOWFLAKE CORTEX AI for sentiment analysis!
+# This demonstrates how Cortex LLM functions can analyze text at scale
+
+import random
+from datetime import datetime, timedelta
+
+# Get date range from our market data
+min_date = market_df['DATE'].min()
+max_date = market_df['DATE'].max()
+symbols = market_df['SYMBOL'].unique().tolist()
+
+np.random.seed(42)
+random.seed(42)
+
+# Realistic financial news headline templates (no pre-scored sentiment!)
+headline_templates = [
+    "beats earnings expectations with strong quarterly results",
+    "announces strategic partnership to expand market presence",
+    "faces regulatory investigation over compliance concerns",
+    "launches innovative new product line ahead of schedule",
+    "reports significant supply chain disruptions affecting production",
+    "receives analyst upgrade citing growth potential",
+    "CEO sells significant stock holdings in planned transaction",
+    "posts record revenue growth exceeding analyst estimates",
+    "misses quarterly targets amid challenging market conditions",
+    "expands aggressively into new international markets",
+    "announces major layoffs as part of restructuring plan",
+    "secures major government contract worth billions",
+    "faces class action lawsuit from shareholders",
+    "reports cybersecurity breach affecting customer data",
+    "raises full-year guidance following strong performance",
+    "cuts dividend amid cash flow concerns",
+    "announces stock buyback program worth $10 billion",
+    "loses key executive to competitor",
+    "wins patent dispute against rival company",
+    "warns of slowing demand in key markets"
+]
+
+sources = ['Reuters', 'Bloomberg', 'CNBC', 'WSJ', 'Financial Times', 'MarketWatch']
+
+# Generate headlines (we'll let Cortex score them!)
+headline_records = []
+current_date = pd.to_datetime(min_date)
+end_date = pd.to_datetime(max_date)
+
+while current_date <= end_date:
+    if current_date.weekday() < 5:  # Weekdays only
+        for symbol in symbols:
+            n_articles = np.random.poisson(2)  # Average 2 articles per stock per day
+            for _ in range(n_articles):
+                headline = f"{symbol} {random.choice(headline_templates)}"
+                headline_records.append({
+                    'DATE': current_date.strftime('%Y-%m-%d'),
+                    'SYMBOL': symbol,
+                    'HEADLINE': headline,
+                    'SOURCE': random.choice(sources)
+                })
+    current_date += timedelta(days=1)
+
+headline_df = pd.DataFrame(headline_records)
+print(f"📰 Generated {len(headline_df):,} news headlines")
+print(f"   Now using Snowflake Cortex AI to analyze sentiment...")
+
+# Write headlines to staging table
+headline_snow_df = session.create_dataframe(headline_df)
+headline_snow_df.write.mode("overwrite").save_as_table("NEWS_HEADLINES_RAW")
+
+# Use SNOWFLAKE CORTEX SENTIMENT function to analyze headlines!
+# This is the magic - LLM-powered sentiment analysis at scale!
+cortex_sentiment_sql = """
+SELECT 
+    DATE,
+    SYMBOL,
+    HEADLINE,
+    SOURCE,
+    -- Snowflake Cortex SENTIMENT function returns score from -1 to 1
+    SNOWFLAKE.CORTEX.SENTIMENT(HEADLINE) AS SENTIMENT_SCORE,
+    -- Confidence derived from sentiment MAGNITUDE using Cortex output
+    -- Strong sentiment (±0.9) = high confidence, Weak sentiment (±0.1) = low confidence
+    -- Formula: 0.5 + (|sentiment| * 0.5) gives range 0.5 to 1.0
+    0.5 + (ABS(SNOWFLAKE.CORTEX.SENTIMENT(HEADLINE)) * 0.5) AS CONFIDENCE
+FROM NEWS_HEADLINES_RAW
+"""
+
+print("🤖 Running Snowflake Cortex SENTIMENT analysis...")
+session.sql(cortex_sentiment_sql).write.mode("overwrite").save_as_table("NEWS_SENTIMENT")
+
+print(f"✅ Created NEWS_SENTIMENT table with Cortex AI sentiment scores!")
+print(f"   🧠 Powered by: SNOWFLAKE.CORTEX.SENTIMENT()")
+print(f"   📊 Sentiment range: -1 (very negative) to +1 (very positive)")
+print(f"   🎯 Confidence: Derived from sentiment magnitude (stronger = more confident)")
+
+# Show sample with Cortex-generated sentiment and confidence
+session.sql("""
+    SELECT SYMBOL, 
+           ROUND(SENTIMENT_SCORE, 3) AS SENTIMENT,
+           ROUND(CONFIDENCE, 3) AS CONFIDENCE,
+           CASE 
+               WHEN SENTIMENT_SCORE > 0.3 THEN '🟢 Positive'
+               WHEN SENTIMENT_SCORE < -0.3 THEN '🔴 Negative'
+               ELSE '🟡 Neutral'
+           END AS LABEL,
+           HEADLINE
+    FROM NEWS_SENTIMENT 
+    ORDER BY ABS(SENTIMENT_SCORE) DESC 
+    LIMIT 10
+""").show()
+
+```
+<img width="765" height="389" alt="image" src="https://github.com/user-attachments/assets/991d44a4-7768-45ed-b9b5-b81d2e0fe61c" />
+
 
 ## 📈 Multi-Factor Alpha Architecture
 
