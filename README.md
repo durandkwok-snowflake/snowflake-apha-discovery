@@ -88,6 +88,18 @@ market_df.head(10)
 ```
 <img width="1106" height="403" alt="image" src="https://github.com/user-attachments/assets/97421957-d097-4fa2-820e-e491a3949ad9" />
 
+```PYTHON
+# Write market data to our analytics schema
+# This creates a copy we can work with for our alpha calculations
+market_snow_df = session.create_dataframe(market_df)
+market_snow_df.write.mode("overwrite").save_as_table("MARKET_DATA")
+
+print("✅ Created MARKET_DATA table from Cybersyn Marketplace data")
+print(f"   Source: FINANCIAL__ECONOMIC_ESSENTIALS.CYBERSYN.STOCK_PRICE_TIMESERIES")
+session.table("MARKET_DATA").show(5)
+```
+
+<img width="538" height="210" alt="image" src="https://github.com/user-attachments/assets/05dc2112-89ab-46fd-967e-6a5b728823d3" />
 
 
 ## 📈 Multi-Factor Alpha Architecture
