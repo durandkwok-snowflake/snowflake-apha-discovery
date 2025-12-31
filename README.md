@@ -46,7 +46,30 @@ The research engine focuses on three primary drivers of excess return (Alpha), u
 * **Implementation:** Leverages `SNOWFLAKE.CORTEX.SENTIMENT()` to score headlines from -1 to 1.
 * **Normalization:** Daily scores are averaged and ranked cross-sectionally.
 
+### 4. Setting Up the Environment
+```python
+# Get latest signals - Today's trading recommendations
+latest_signals_sql = """
+SELECT 
+    SYMBOL,
+    ROUND(CLOSE, 2) AS PRICE,
+    ROUND(MOMENTUM_RANK, 3) AS MOMENTUM,
+    ROUND(VOLATILITY_RANK, 3) AS VOLATILITY,
+    ROUND(SENTIMENT_RANK, 3) AS SENTIMENT,
+    ROUND(COMPOSITE_ALPHA, 3) AS ALPHA_SCORE,
+    TRADING_SIGNAL
+FROM ALPHA_SIGNALS
+WHERE DATE = (SELECT MAX(DATE) FROM ALPHA_SIGNALS)
+ORDER BY COMPOSITE_ALPHA DESC
+"""
 
+print("🎯 TODAY'S ALPHA SIGNALS")
+print("=" * 60)
+session.sql(latest_signals_sql).show()
+
+```
+
+<img width="686" height="298" alt="image" src="https://github.com/user-attachments/assets/08070486-89db-4bae-8d0c-a654149db583" />
 
 ---
 
