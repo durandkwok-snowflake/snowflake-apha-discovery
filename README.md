@@ -41,7 +41,7 @@ print("✅ Created HEDGE_FUND_DEMO.ANALYTICS schema")
 
 ```
 
-## LOADING UNIVERSE
+## Pulling in historical OHLCV data for expanded stocks
 ```PYTHON
 # Load REAL market data from Cybersyn (Snowflake Marketplace)
 # This pulls historical OHLCV data for our expanded stock universe
