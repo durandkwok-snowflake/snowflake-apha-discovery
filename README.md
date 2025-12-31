@@ -237,7 +237,83 @@ The research engine focuses on three primary drivers of excess return (Alpha), u
 * **Implementation:** Leverages `SNOWFLAKE.CORTEX.SENTIMENT()` to score headlines from -1 to 1.
 * **Normalization:** Daily scores are averaged and ranked cross-sectionally.
 
-### 4. Analyze Apha Signals
+### 4. Combine Apha Factors
+```PYTHON
+# Combine all factors into composite alpha signal
+
+# Based on typical market analysis:
+#   - Momentum often reverses (mean reversion) → negative weight
+#   - Low-vol anomaly may not hold in risk-on markets → negative weight
+#   - Sentiment tends to be predictive → positive weight
+# These will be validated/updated by the IC analysis later in the notebook
+
+MOMENTUM_WEIGHT = -0.20    
+VOLATILITY_WEIGHT = -0.30  
+SENTIMENT_WEIGHT = 0.50    
+
+print("📊 Using IC-OPTIMIZED Weights:")
+print(f"   Momentum:   {MOMENTUM_WEIGHT:+.0%} {'(FLIPPED - betting on mean reversion)' if MOMENTUM_WEIGHT < 0 else ''}")
+print(f"   Volatility: {VOLATILITY_WEIGHT:+.0%} {'(FLIPPED - high-vol stocks outperforming)' if VOLATILITY_WEIGHT < 0 else ''}")
+print(f"   Sentiment:  {SENTIMENT_WEIGHT:+.0%} (primary signal)")
+print()
+
+composite_alpha_sql = f"""
+WITH combined AS (
+    SELECT 
+        m.DATE,
+        m.SYMBOL,
+        m.CLOSE,
+        m.MOMENTUM_RANK,
+        m.MOMENTUM_SIGNAL,
+        v.VOLATILITY_RANK,
+        v.VOLATILITY_SIGNAL,
+        COALESCE(s.SENTIMENT_RANK, 0.5) AS SENTIMENT_RANK,
+        COALESCE(s.SENTIMENT_SIGNAL, 0) AS SENTIMENT_SIGNAL,
+        s.AVG_SENTIMENT,
+        s.ARTICLE_COUNT
+    FROM MOMENTUM_FACTOR m
+    LEFT JOIN VOLATILITY_FACTOR v 
+        ON m.DATE = v.DATE AND m.SYMBOL = v.SYMBOL
+    LEFT JOIN SENTIMENT_FACTOR s 
+        ON m.DATE = s.DATE AND m.SYMBOL = s.SYMBOL
+)
+SELECT 
+    *,
+    -- IC-OPTIMIZED composite alpha (negative weights FLIP the signal!)
+    (MOMENTUM_RANK * {MOMENTUM_WEIGHT} + 
+     VOLATILITY_RANK * {VOLATILITY_WEIGHT} + 
+     SENTIMENT_RANK * {SENTIMENT_WEIGHT}) AS COMPOSITE_ALPHA,
+    
+    -- Weighted signal (negative weights flip BUY to SELL)
+    (MOMENTUM_SIGNAL * {MOMENTUM_WEIGHT} + 
+     VOLATILITY_SIGNAL * {VOLATILITY_WEIGHT} + 
+     SENTIMENT_SIGNAL * {SENTIMENT_WEIGHT}) AS WEIGHTED_SIGNAL,
+     
+    -- Trading recommendation based on optimized signal
+    CASE 
+        WHEN (MOMENTUM_SIGNAL * {MOMENTUM_WEIGHT} + VOLATILITY_SIGNAL * {VOLATILITY_WEIGHT} + SENTIMENT_SIGNAL * {SENTIMENT_WEIGHT}) > 0.2 THEN 'STRONG_BUY'
+        WHEN (MOMENTUM_SIGNAL * {MOMENTUM_WEIGHT} + VOLATILITY_SIGNAL * {VOLATILITY_WEIGHT} + SENTIMENT_SIGNAL * {SENTIMENT_WEIGHT}) > 0.05 THEN 'BUY'
+        WHEN (MOMENTUM_SIGNAL * {MOMENTUM_WEIGHT} + VOLATILITY_SIGNAL * {VOLATILITY_WEIGHT} + SENTIMENT_SIGNAL * {SENTIMENT_WEIGHT}) < -0.2 THEN 'STRONG_SELL'
+        WHEN (MOMENTUM_SIGNAL * {MOMENTUM_WEIGHT} + VOLATILITY_SIGNAL * {VOLATILITY_WEIGHT} + SENTIMENT_SIGNAL * {SENTIMENT_WEIGHT}) < -0.05 THEN 'SELL'
+        ELSE 'HOLD'
+    END AS TRADING_SIGNAL
+FROM combined
+WHERE DATE IS NOT NULL
+ORDER BY DATE DESC, COMPOSITE_ALPHA DESC
+"""
+
+composite_alpha = session.sql(composite_alpha_sql)
+composite_alpha.write.mode("overwrite").save_as_table("ALPHA_SIGNALS")
+
+print("✅ Created ALPHA_SIGNALS table with IC-OPTIMIZED composite alpha")
+print("   (Negative weights flip momentum/volatility signals for mean reversion)")
+session.table("ALPHA_SIGNALS").show(15)
+```
+<img width="1104" height="342" alt="image" src="https://github.com/user-attachments/assets/641d9095-3a8b-4863-a210-785c49ac684f" />
+
+
+
+### 5. Analyze Apha Signals
 ```python
 # Get latest signals - Today's trading recommendations
 latest_signals_sql = """
