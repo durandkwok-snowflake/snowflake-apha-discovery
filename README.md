@@ -40,7 +40,55 @@ session.sql("USE SCHEMA HEDGE_FUND_DEMO.ANALYTICS").collect()
 print("✅ Created HEDGE_FUND_DEMO.ANALYTICS schema")
 
 ```
-    
+
+## LOADING UNIVERSE
+```PYTHON
+# Load REAL market data from Cybersyn (Snowflake Marketplace)
+# This pulls historical OHLCV data for our expanded stock universe
+# Includes: Tech, Financials, Payments, Healthcare, Consumer, Energy, Industrials
+
+market_data_sql = """
+SELECT 
+    t.DATE,
+    t.TICKER AS SYMBOL,
+    MAX(CASE WHEN t.VARIABLE_NAME = 'Pre-Market Open' THEN t.VALUE END) AS OPEN,
+    MAX(CASE WHEN t.VARIABLE_NAME = 'All-Day High' THEN t.VALUE END) AS HIGH,
+    MAX(CASE WHEN t.VARIABLE_NAME = 'All-Day Low' THEN t.VALUE END) AS LOW,
+    MAX(CASE WHEN t.VARIABLE_NAME = 'Post-Market Close' THEN t.VALUE END) AS CLOSE,
+    MAX(CASE WHEN t.VARIABLE_NAME = 'Nasdaq Volume' THEN t.VALUE END) AS VOLUME
+FROM FINANCIAL__ECONOMIC_ESSENTIALS.CYBERSYN.STOCK_PRICE_TIMESERIES t
+WHERE t.TICKER IN (
+        -- Tech Giants
+        'AAPL', 'GOOGL', 'MSFT', 'AMZN', 'META', 'NVDA', 'TSLA',
+        -- Financials (Investment Banks)
+        'JPM', 'GS', 'MS', 'BAC', 'WFC', 'C',
+        -- Payments & FinTech
+        'V', 'MA', 'PYPL', 'SQ',
+        -- Healthcare & Pharma
+        'JNJ', 'UNH', 'PFE', 'MRK', 'ABBV',
+        -- Consumer & Retail
+        'WMT', 'COST', 'HD', 'NKE', 'SBUX',
+        -- Energy
+        'XOM', 'CVX', 'COP',
+        -- Industrials
+        'CAT', 'BA', 'UPS', 'HON'
+    )
+  AND t.VARIABLE_NAME IN ('Pre-Market Open', 'All-Day High', 'All-Day Low', 'Post-Market Close', 'Nasdaq Volume')
+  AND t.DATE >= DATEADD(year, -1, CURRENT_DATE())  -- Last 1 year of data
+GROUP BY t.DATE, t.TICKER
+HAVING CLOSE IS NOT NULL  -- Ensure we have closing prices
+ORDER BY t.TICKER, t.DATE
+"""
+
+market_df = session.sql(market_data_sql).to_pandas()
+print(f"✅ Loaded {len(market_df):,} market data records from Cybersyn")
+print(f"   Date range: {market_df['DATE'].min()} to {market_df['DATE'].max()}")
+print(f"   Symbols ({len(market_df['SYMBOL'].unique())} stocks): {', '.join(sorted(market_df['SYMBOL'].unique()))}")
+market_df.head(10)
+```
+<img width="1106" height="403" alt="image" src="https://github.com/user-attachments/assets/97421957-d097-4fa2-820e-e491a3949ad9" />
+
+
 
 ## 📈 Multi-Factor Alpha Architecture
 
