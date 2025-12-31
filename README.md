@@ -24,7 +24,7 @@ The project shifts quantitative research from local environments to the data, ut
 
 ---
 
-## 🛒 Load Market Data from Snowflake Marketplace
+## 🛒 Create Database and Schema then Load Market Data from Snowflake Marketplace
 
 We utilize real market data from the Cybersyn Financial & Economic Essentials dataset available on the Snowflake Marketplace.
 	•	Zero ETL: Hedge funds can instantly access high-quality historical OHLCV data without building complex ingestion pipelines.
