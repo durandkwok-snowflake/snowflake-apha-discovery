@@ -46,7 +46,7 @@ The research engine focuses on three primary drivers of excess return (Alpha), u
 * **Implementation:** Leverages `SNOWFLAKE.CORTEX.SENTIMENT()` to score headlines from -1 to 1.
 * **Normalization:** Daily scores are averaged and ranked cross-sectionally.
 
-### 4. Setting Up the Environment
+### 4. Analyze Apha Signals
 ```python
 # Get latest signals - Today's trading recommendations
 latest_signals_sql = """
