@@ -24,6 +24,24 @@ The project shifts quantitative research from local environments to the data, ut
 
 ---
 
+## 🛒 Load Market Data from Snowflake Marketplace
+
+We utilize real market data from the Cybersyn Financial & Economic Essentials dataset available on the Snowflake Marketplace.
+	•	Zero ETL: Hedge funds can instantly access high-quality historical OHLCV data without building complex ingestion pipelines.
+	•	Dynamic Stock Universe: The notebook expands beyond standard benchmarks to include Tech giants, Financials, Payments, Healthcare, Consumer, Energy, and Industrials.
+	•	Freshness: Data is queried directly from the provider's share, ensuring research is always conducted on the most up-to-date figures.
+
+```PYTHON
+# Create database and schema for hedge fund analytics
+session.sql("CREATE DATABASE IF NOT EXISTS HEDGE_FUND_DEMO").collect()
+session.sql("CREATE SCHEMA IF NOT EXISTS HEDGE_FUND_DEMO.ANALYTICS").collect()
+session.sql("USE SCHEMA HEDGE_FUND_DEMO.ANALYTICS").collect()
+
+print("✅ Created HEDGE_FUND_DEMO.ANALYTICS schema")
+
+```
+    
+
 ## 📈 Multi-Factor Alpha Architecture
 
 The research engine focuses on three primary drivers of excess return (Alpha), utilizing **Cross-Sectional Ranking** to ensure signals are comparable across the universe.
