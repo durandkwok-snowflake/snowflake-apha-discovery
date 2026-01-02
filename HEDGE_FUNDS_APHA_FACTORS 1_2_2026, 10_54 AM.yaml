@@ -1,0 +1,512 @@
+name: HEDGE_FUNDS_APHA_FACTORS
+tables:
+  - name: ALPHA_SIGNALS
+    description: The table contains records of investment signals and analytics for financial securities on specific trading dates. Each record includes market data, technical indicators, sentiment analysis metrics, and composite scoring used to generate trading recommendations.
+    base_table:
+      database: HEDGE_FUND_DEMO
+      schema: ANALYTICS
+      table: ALPHA_SIGNALS
+    dimensions:
+      - name: ARTICLE_COUNT
+        description: The number of articles analyzed or referenced in generating the alpha signal.
+        expr: ARTICLE_COUNT
+        data_type: NUMBER(38,0)
+        sample_values:
+          - '4'
+          - '2'
+          - '5'
+      - name: MOMENTUM_SIGNAL
+        description: A momentum signal indicating the directional strength of price movement trends.
+        expr: MOMENTUM_SIGNAL
+        data_type: NUMBER(38,0)
+        sample_values:
+          - '-1'
+          - '1'
+          - '0'
+      - name: SENTIMENT_SIGNAL
+        description: Sentiment signal indicating positive, negative, or neutral market sentiment.
+        expr: SENTIMENT_SIGNAL
+        data_type: NUMBER(38,0)
+        sample_values:
+          - '-1'
+          - '1'
+          - '0'
+      - name: SYMBOL
+        description: Stock ticker symbols representing publicly traded companies.
+        expr: SYMBOL
+        data_type: VARCHAR(16777216)
+        sample_values:
+          - UNH
+          - AMZN
+          - GS
+      - name: TRADING_SIGNAL
+        description: Trading recommendations indicating the suggested action to take on a financial instrument.
+        expr: TRADING_SIGNAL
+        data_type: VARCHAR(11)
+        sample_values:
+          - HOLD
+          - STRONG_BUY
+          - BUY
+      - name: VOLATILITY_SIGNAL
+        description: A signal indicating the volatility direction or trend for financial analysis.
+        expr: VOLATILITY_SIGNAL
+        data_type: NUMBER(38,0)
+        sample_values:
+          - '-1'
+          - '0'
+          - '1'
+    time_dimensions:
+      - name: DATE
+        description: The date when the alpha signal was generated or recorded.
+        expr: DATE
+        data_type: DATE
+        sample_values:
+          - '2025-09-09'
+          - '2025-05-16'
+          - '2025-07-18'
+    facts:
+      - name: AVG_SENTIMENT
+        description: Average sentiment score indicating the overall market or security sentiment.
+        expr: AVG_SENTIMENT
+        data_type: FLOAT
+        access_modifier: public_access
+        sample_values:
+          - '0.72265625'
+          - '-0.099609375'
+          - '-0.0703125'
+      - name: CLOSE
+        description: The closing price of a financial instrument.
+        expr: CLOSE
+        data_type: FLOAT
+        access_modifier: public_access
+        sample_values:
+          - '100.56'
+          - '884.42'
+          - '56.23'
+      - name: COMPOSITE_ALPHA
+        description: Composite alpha values representing the excess return of an investment relative to a benchmark.
+        expr: COMPOSITE_ALPHA
+        data_type: FLOAT
+        access_modifier: public_access
+        sample_values:
+          - '-0.3334134615'
+          - '-0.04364224138'
+          - '-0.2918103448'
+      - name: MOMENTUM_RANK
+        description: The momentum ranking of a financial instrument or security.
+        expr: MOMENTUM_RANK
+        data_type: FLOAT
+        access_modifier: public_access
+        sample_values:
+          - '0.125'
+          - '0.8125'
+          - '0.5'
+      - name: SENTIMENT_RANK
+        description: Sentiment ranking scores indicating the relative sentiment position of financial instruments or market conditions.
+        expr: SENTIMENT_RANK
+        data_type: FLOAT
+        access_modifier: public_access
+        sample_values:
+          - '0.5'
+          - '0.962962963'
+          - '0.3703703704'
+      - name: VOLATILITY_RANK
+        description: The volatility ranking of a financial instrument or security on a normalized scale.
+        expr: VOLATILITY_RANK
+        data_type: FLOAT
+        access_modifier: public_access
+        sample_values:
+          - '0.71875'
+          - '0.5'
+          - '0.84375'
+      - name: WEIGHTED_SIGNAL
+        description: Weighted alpha signal values used in hedge fund analytics.
+        expr: WEIGHTED_SIGNAL
+        data_type: NUMBER(38,1)
+        access_modifier: public_access
+        sample_values:
+          - '-0.2'
+          - '-0.3'
+          - '0.0'
+    primary_key:
+      columns:
+        - DATE
+        - SYMBOL
+  - name: MARKET_DATA
+    description: The table contains records of daily stock market data for various securities. Each record represents a single trading day for a specific stock symbol and includes price movements and trading volume information.
+    base_table:
+      database: HEDGE_FUND_DEMO
+      schema: ANALYTICS
+      table: MARKET_DATA
+    dimensions:
+      - name: SYMBOL
+        description: Stock ticker symbols representing publicly traded companies.
+        expr: SYMBOL
+        data_type: VARCHAR(16777216)
+        sample_values:
+          - AAPL
+          - AMZN
+          - ABBV
+    time_dimensions:
+      - name: DATE
+        description: The date when the market data was recorded or observed.
+        expr: DATE
+        data_type: DATE
+        sample_values:
+          - '2025-07-23'
+          - '2025-01-03'
+          - '2025-09-11'
+    facts:
+      - name: CLOSE
+        description: The closing price of a financial instrument at the end of a trading period.
+        expr: CLOSE
+        data_type: FLOAT
+        access_modifier: public_access
+        sample_values:
+          - '189.44'
+          - '243.2'
+          - '278.34'
+      - name: HIGH
+        description: The highest price reached during the trading period.
+        expr: HIGH
+        data_type: FLOAT
+        access_modifier: public_access
+        sample_values:
+          - '181.58'
+          - '241.05'
+          - '200.525'
+      - name: LOW
+        description: The lowest price reached during the trading period.
+        expr: LOW
+        data_type: FLOAT
+        access_modifier: public_access
+        sample_values:
+          - '249.44'
+          - '201.68'
+          - '241.83'
+      - name: OPEN
+        description: The opening price of a financial instrument at the start of a trading period.
+        expr: OPEN
+        data_type: FLOAT
+        access_modifier: public_access
+        sample_values:
+          - '239.73'
+          - '226.6'
+          - '252'
+      - name: VOLUME
+        description: The number of shares or contracts traded for a security during a specific time period.
+        expr: VOLUME
+        data_type: FLOAT
+        access_modifier: public_access
+        sample_values:
+          - '10233495'
+          - '12589323'
+          - '13641227'
+    primary_key:
+      columns:
+        - DATE
+        - SYMBOL
+  - name: MOMENTUM_FACTOR
+    description: The table contains records of momentum-based trading signals for financial securities. Each record represents a single security on a specific date and includes price data, momentum calculations, rankings, and trading signals.
+    base_table:
+      database: HEDGE_FUND_DEMO
+      schema: ANALYTICS
+      table: MOMENTUM_FACTOR
+    dimensions:
+      - name: MOMENTUM_SIGNAL
+        description: A numerical signal indicating the momentum direction or strength for financial analysis.
+        expr: MOMENTUM_SIGNAL
+        data_type: NUMBER(38,0)
+        sample_values:
+          - '1'
+          - '-1'
+          - '0'
+      - name: SYMBOL
+        description: Stock ticker symbols representing publicly traded companies.
+        expr: SYMBOL
+        data_type: VARCHAR(16777216)
+        sample_values:
+          - AAPL
+          - AMZN
+          - ABBV
+    time_dimensions:
+      - name: DATE
+        description: The date associated with the momentum factor calculation.
+        expr: DATE
+        data_type: DATE
+        sample_values:
+          - '2025-01-29'
+          - '2025-07-10'
+          - '2025-09-02'
+    facts:
+      - name: CLOSE
+        description: The closing price of a financial instrument.
+        expr: CLOSE
+        data_type: FLOAT
+        access_modifier: public_access
+        sample_values:
+          - '542.01'
+          - '365.4'
+          - '238.22'
+      - name: MOMENTUM_20D
+        description: The 20-day momentum factor value used in quantitative analysis.
+        expr: MOMENTUM_20D
+        data_type: FLOAT
+        access_modifier: public_access
+        sample_values:
+          - '-0.05123188116'
+          - '0.07406162465'
+          - '0.1072452229'
+      - name: MOMENTUM_RANK
+        description: The ranking of securities based on their momentum factor performance.
+        expr: MOMENTUM_RANK
+        data_type: FLOAT
+        access_modifier: public_access
+        sample_values:
+          - '0'
+          - '0.1875'
+          - '0.5625'
+    primary_key:
+      columns:
+        - DATE
+        - SYMBOL
+  - name: NEWS_HEADLINES_RAW
+    description: The table contains records of financial news headlines organized by date and stock symbol. Each record includes the headline text and identifies the news source that published it.
+    base_table:
+      database: HEDGE_FUND_DEMO
+      schema: ANALYTICS
+      table: NEWS_HEADLINES_RAW
+    dimensions:
+      - name: DATE
+        description: The date when the news headline was published or recorded.
+        expr: DATE
+        data_type: VARCHAR(16777216)
+        sample_values:
+          - '2025-01-01'
+          - '2025-01-02'
+          - '2024-12-31'
+      - name: HEADLINE
+        description: News headlines related to publicly traded companies and their business activities.
+        expr: HEADLINE
+        data_type: VARCHAR(16777216)
+        sample_values:
+          - AAPL misses quarterly targets amid challenging market conditions
+          - AAPL posts record revenue growth exceeding analyst estimates
+          - MRK posts record revenue growth exceeding analyst estimates
+      - name: SOURCE
+        description: The news source or publication that published the headline.
+        expr: SOURCE
+        data_type: VARCHAR(16777216)
+        sample_values:
+          - MarketWatch
+          - Bloomberg
+          - Reuters
+      - name: SYMBOL
+        description: Stock ticker symbols representing publicly traded companies.
+        expr: SYMBOL
+        data_type: VARCHAR(16777216)
+        sample_values:
+          - AAPL
+          - AMZN
+          - ABBV
+    primary_key:
+      columns:
+        - DATE
+        - HEADLINE
+        - SOURCE
+        - SYMBOL
+  - name: NEWS_SENTIMENT
+    description: The table contains records of news sentiment analysis for financial securities. Each record represents a single news headline with its associated sentiment scoring and confidence metrics.
+    base_table:
+      database: HEDGE_FUND_DEMO
+      schema: ANALYTICS
+      table: NEWS_SENTIMENT
+    dimensions:
+      - name: DATE
+        description: Dates when news sentiment was recorded or analyzed.
+        expr: DATE
+        data_type: VARCHAR(16777216)
+        sample_values:
+          - '2025-01-01'
+          - '2025-01-02'
+          - '2024-12-31'
+      - name: HEADLINE
+        description: News headlines related to publicly traded companies and their business developments.
+        expr: HEADLINE
+        data_type: VARCHAR(16777216)
+        sample_values:
+          - AAPL misses quarterly targets amid challenging market conditions
+          - AAPL posts record revenue growth exceeding analyst estimates
+          - MRK posts record revenue growth exceeding analyst estimates
+      - name: SOURCE
+        description: The news source or publication that provided the information.
+        expr: SOURCE
+        data_type: VARCHAR(16777216)
+        sample_values:
+          - MarketWatch
+          - Bloomberg
+          - Reuters
+      - name: SYMBOL
+        description: Stock ticker symbols representing publicly traded companies.
+        expr: SYMBOL
+        data_type: VARCHAR(16777216)
+        sample_values:
+          - AAPL
+          - AMZN
+          - ABBV
+    facts:
+      - name: CONFIDENCE
+        description: The confidence level or certainty score associated with the news sentiment analysis.
+        expr: CONFIDENCE
+        data_type: FLOAT
+        access_modifier: public_access
+        sample_values:
+          - '0.70703125'
+          - '0.509765625'
+          - '0.705078125'
+      - name: SENTIMENT_SCORE
+        description: Numerical sentiment score indicating the positive or negative sentiment of news content.
+        expr: SENTIMENT_SCORE
+        data_type: FLOAT
+        access_modifier: public_access
+        sample_values:
+          - '0.0546875'
+          - '0.390625'
+          - '0.625'
+    primary_key:
+      columns:
+        - DATE
+        - HEADLINE
+        - SOURCE
+        - SYMBOL
+  - name: SENTIMENT_FACTOR
+    description: The table contains records of sentiment analysis metrics for financial securities over time. Each record represents sentiment data for a specific security on a given date, including aggregated sentiment scores, article volumes, confidence levels, and derived ranking signals.
+    base_table:
+      database: HEDGE_FUND_DEMO
+      schema: ANALYTICS
+      table: SENTIMENT_FACTOR
+    dimensions:
+      - name: ARTICLE_COUNT
+        description: The number of articles used in the sentiment analysis.
+        expr: ARTICLE_COUNT
+        data_type: NUMBER(38,0)
+        sample_values:
+          - '1'
+          - '2'
+          - '3'
+      - name: DATE
+        description: Dates associated with sentiment factor calculations.
+        expr: DATE
+        data_type: VARCHAR(16777216)
+        sample_values:
+          - '2025-11-13'
+          - '2025-05-27'
+          - '2025-01-27'
+      - name: SENTIMENT_SIGNAL
+        description: A numerical signal indicating the sentiment direction with positive, negative, or neutral values.
+        expr: SENTIMENT_SIGNAL
+        data_type: NUMBER(38,0)
+        sample_values:
+          - '1'
+          - '-1'
+          - '0'
+      - name: SYMBOL
+        description: Stock ticker symbols for publicly traded companies.
+        expr: SYMBOL
+        data_type: VARCHAR(16777216)
+        sample_values:
+          - TSLA
+          - V
+          - UNH
+    facts:
+      - name: AVG_CONFIDENCE
+        description: The average confidence level of sentiment analysis predictions.
+        expr: AVG_CONFIDENCE
+        data_type: FLOAT
+        access_modifier: public_access
+        sample_values:
+          - '0.736328125'
+          - '0.669921875'
+          - '0.6985677083'
+      - name: AVG_SENTIMENT
+        description: The average sentiment score indicating positive or negative market sentiment.
+        expr: AVG_SENTIMENT
+        data_type: FLOAT
+        access_modifier: public_access
+        sample_values:
+          - '-0.015625'
+          - '0.212890625'
+          - '-0.2916666667'
+      - name: SENTIMENT_RANK
+        description: A numerical ranking or score representing sentiment levels.
+        expr: SENTIMENT_RANK
+        data_type: FLOAT
+        access_modifier: public_access
+        sample_values:
+          - '0'
+          - '0.8333333333'
+          - '0.8214285714'
+  - name: VOLATILITY_FACTOR
+    description: The table contains records of financial securities with calculated volatility metrics. Each record represents a security on a specific date and includes pricing data along with volatility measurements, rankings, and trading signals.
+    base_table:
+      database: HEDGE_FUND_DEMO
+      schema: ANALYTICS
+      table: VOLATILITY_FACTOR
+    dimensions:
+      - name: SYMBOL
+        description: Stock ticker symbols representing publicly traded companies.
+        expr: SYMBOL
+        data_type: VARCHAR(16777216)
+        sample_values:
+          - AAPL
+          - AMZN
+          - ABBV
+      - name: VOLATILITY_SIGNAL
+        description: A numerical signal indicating the direction or magnitude of volatility changes.
+        expr: VOLATILITY_SIGNAL
+        data_type: NUMBER(38,0)
+        sample_values:
+          - '1'
+          - '-1'
+          - '0'
+    time_dimensions:
+      - name: DATE
+        description: The date when the volatility factor was calculated or recorded.
+        expr: DATE
+        data_type: DATE
+        sample_values:
+          - '2025-06-17'
+          - '2025-09-02'
+          - '2025-09-15'
+    facts:
+      - name: CLOSE
+        description: The closing price of a financial instrument.
+        expr: CLOSE
+        data_type: FLOAT
+        access_modifier: public_access
+        sample_values:
+          - '176.2'
+          - '703.5'
+          - '362.01'
+      - name: VOLATILITY_20D
+        description: The 20-day volatility factor measuring price fluctuation over a rolling 20-day period.
+        expr: VOLATILITY_20D
+        data_type: FLOAT
+        access_modifier: public_access
+        sample_values:
+          - '0.1628213645'
+          - '0.1962379399'
+          - '0.214221804'
+      - name: VOLATILITY_RANK
+        description: The ranking of volatility levels expressed as decimal values between zero and one.
+        expr: VOLATILITY_RANK
+        data_type: FLOAT
+        access_modifier: public_access
+        sample_values:
+          - '0.28125'
+          - '0.53125'
+          - '0.875'
+    primary_key:
+      columns:
+        - DATE
+        - SYMBOL
