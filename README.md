@@ -252,9 +252,9 @@ VOLATILITY_WEIGHT = -0.30
 SENTIMENT_WEIGHT = 0.50    
 
 print("📊 Using IC-OPTIMIZED Weights:")
-print(f"   Momentum:   {MOMENTUM_WEIGHT:+.0%} {'(FLIPPED - betting on mean reversion)' if MOMENTUM_WEIGHT < 0 else ''}")
-print(f"   Volatility: {VOLATILITY_WEIGHT:+.0%} {'(FLIPPED - high-vol stocks outperforming)' if VOLATILITY_WEIGHT < 0 else ''}")
-print(f"   Sentiment:  {SENTIMENT_WEIGHT:+.0%} (primary signal)")
+print(f"   Momentum:   {MOMENTUM_WEIGHT:+.0%} ")
+print(f"   Volatility: {VOLATILITY_WEIGHT:+.0%} ")
+print(f"   Sentiment:  {SENTIMENT_WEIGHT:+.0%} ")
 print()
 
 composite_alpha_sql = f"""
